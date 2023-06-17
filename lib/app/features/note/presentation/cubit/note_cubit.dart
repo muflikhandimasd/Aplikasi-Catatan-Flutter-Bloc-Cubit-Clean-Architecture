@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:my_note_app/app/features/note/domain/usecases/create_note_usecase.dart';
@@ -25,8 +28,16 @@ class NoteCubit extends Cubit<NoteState> {
     required this.deleteNote,
   }) : super(NoteInitial());
 
+  @override
+  void onChange(Change<NoteState> change) {
+    if (kDebugMode) {
+      log(change.toString());
+    }
+    super.onChange(change);
+  }
+
   void get() async {
-    if (state is! NoteLoading) emit(NoteLoading());
+    emit(NoteLoading());
     final result = await getNote(const NoParams());
     result.fold((failure) => emit(NoteError(failure.message)),
         (notes) => emit(NoteLoaded(notes)));
