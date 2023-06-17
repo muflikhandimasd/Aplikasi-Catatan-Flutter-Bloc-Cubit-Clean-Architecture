@@ -1,15 +1,19 @@
+import 'package:objectbox/objectbox.dart';
+
+@Entity()
 class Note {
-  final int id;
-  final String title;
+  @Id()
+  int id;
+  String? title;
   final String content;
-  final DateTime createdTime;
+
+  @Property(type: PropertyType.date)
   final DateTime lastEditedTime;
 
   Note({
-    required this.id,
-    required this.title,
+    this.id = 0,
+    this.title,
     required this.content,
-    required this.createdTime,
     required this.lastEditedTime,
   });
 }
