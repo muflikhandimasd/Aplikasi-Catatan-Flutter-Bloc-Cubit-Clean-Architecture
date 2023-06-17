@@ -8,12 +8,12 @@ class Note {
   final String content;
 
   @Property(type: PropertyType.date)
-  final DateTime lastEditedTime;
+  final DateTime? lastEditedTime;
 
   Note({
     this.id = 0,
     this.title,
     required this.content,
-    required this.lastEditedTime,
+    this.lastEditedTime,
   });
 }

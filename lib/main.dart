@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:my_note_app/app/features/note/presentation/pages/home_page.dart';
+import './app/core/service_locator/service_locator.dart' as di;
+import 'app/features/note/presentation/cubit/note_cubit.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  runApp(MyApp());
+  await di.init();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -14,8 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [],
-      child: MyAppView(),
+      providers: [
+        BlocProvider<NoteCubit>(
+          create: (context) => di.sl<NoteCubit>()..get(),
+        ),
+      ],
+      child: const MyAppView(),
     );
   }
 }
@@ -25,6 +33,14 @@ class MyAppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp();
+    FlutterNativeSplash.remove();
+    return MaterialApp(
+      title: 'My Note App',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
+    );
   }
 }

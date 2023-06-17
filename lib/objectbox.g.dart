@@ -99,7 +99,7 @@ ModelDefinition getObjectBoxModel() {
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, titleOffset);
           fbb.addOffset(2, contentOffset);
-          fbb.addInt64(3, object.lastEditedTime.millisecondsSinceEpoch);
+          fbb.addInt64(3, object.lastEditedTime?.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.id;
         },
