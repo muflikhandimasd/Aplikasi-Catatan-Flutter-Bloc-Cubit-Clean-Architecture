@@ -1,33 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:my_note_app/app/core/service_locator/service_locator.dart';
 import 'package:my_note_app/app/features/note/domain/entities/note.dart';
 import 'package:my_note_app/app/features/note/presentation/cubit/note_cubit.dart';
 
 import 'home_page.dart';
 
-class CreateEditPage extends StatelessWidget {
+class CreateEditPage extends StatefulWidget {
   final Note? note;
   CreateEditPage({
     super.key,
     this.note,
   });
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
+  @override
+  State<CreateEditPage> createState() => _CreateEditPageState();
+}
+
+class _CreateEditPageState extends State<CreateEditPage> {
+  late TextEditingController _titleController;
+
+  late TextEditingController _contentController;
+
+  @override
+  void initState() {
+    if (widget.note != null) {
+      _titleController = TextEditingController(text: widget.note?.title);
+      _contentController = TextEditingController(text: widget.note?.content);
+    } else {
+      _titleController = TextEditingController();
+      _contentController = TextEditingController();
+    }
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (note != null) {
-      _titleController.text = note?.title ?? '';
-      _contentController.text = note!.content;
-    }
     return WillPopScope(
       onWillPop: () async {
         if (_contentController.text != '') {
           FocusManager.instance.primaryFocus?.unfocus();
-          if (note == null) {
+          if (widget.note == null) {
             context.read<NoteCubit>().create(
                   Note(
                     title: _titleController.text,
@@ -37,7 +59,7 @@ class CreateEditPage extends StatelessWidget {
           } else {
             context.read<NoteCubit>().update(
                   Note(
-                    id: note!.id,
+                    id: widget.note!.id,
                     title: _titleController.text,
                     content: _contentController.text,
                   ),
@@ -50,17 +72,51 @@ class CreateEditPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(note == null ? 'Create Note' : 'Edit Note'),
+          title: Text(widget.note == null ? 'Create Note' : 'Edit Note'),
           actions: [
-            if (note != null)
+            if (widget.note != null)
               IconButton(
                 onPressed: () {
                   FocusManager.instance.primaryFocus?.unfocus();
-                  context.read<NoteCubit>().delete(note!);
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (_) => const HomePage()));
+                  showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                            title: const Text('Delete Note'),
+                            content: const Text(
+                                'Are you sure want to delete this note?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  context
+                                      .read<NoteCubit>()
+                                      .delete(widget.note!);
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const HomePage()));
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ));
                 },
-                icon: const Icon(Icons.delete),
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
               ),
           ],
         ),
@@ -70,7 +126,8 @@ class CreateEditPage extends StatelessWidget {
             children: [
               Text(
                 DateFormat('dd MMMM yyyy hh:mm:ss').format(DateTime.now()),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               TextFormField(
                 controller: _titleController,
@@ -78,10 +135,9 @@ class CreateEditPage extends StatelessWidget {
                   hintText: 'Title',
                   border: InputBorder.none,
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
                 ),
               ),
               TextFormField(
@@ -89,10 +145,6 @@ class CreateEditPage extends StatelessWidget {
                 decoration: const InputDecoration(
                   hintText: 'Content',
                   border: InputBorder.none,
-                ),
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).primaryColor,
                 ),
                 maxLines: null,
               ),

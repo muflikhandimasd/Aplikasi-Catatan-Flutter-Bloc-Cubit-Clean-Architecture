@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:my_note_app/app/core/service_locator/service_locator.dart';
 
 import '../cubit/note_cubit.dart';
 import 'create_edit_page.dart';
@@ -25,12 +21,12 @@ class HomePage extends StatelessWidget {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 8,
+                  height: 30,
                 ),
                 const Text(
                   'My Notes',
@@ -76,6 +72,26 @@ class HomePage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final note = state.notes[index];
 
+                            Color color;
+
+                            switch (index % 4) {
+                              case 0:
+                                color = Colors.purple[50]!;
+                                break;
+                              case 1:
+                                color = Colors.blue[50]!;
+                                break;
+                              case 2:
+                                color = Colors.green[50]!;
+                                break;
+                              case 3:
+                                color = Colors.orange[50]!;
+                                break;
+
+                              default:
+                                color = Colors.purple[50]!;
+                            }
+
                             return GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -93,13 +109,13 @@ class HomePage extends StatelessWidget {
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.grey.withOpacity(0.1),
-                                        spreadRadius: 2,
-                                        blurRadius: 2,
-                                        offset: const Offset(0, 3),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 2),
                                       ),
                                     ],
                                     borderRadius: BorderRadius.circular(8),
-                                    color: Colors.purple[50],
+                                    color: color,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
@@ -120,8 +136,12 @@ class HomePage extends StatelessWidget {
                                       const SizedBox(
                                         height: 4,
                                       ),
-                                      Text(DateFormat('dd MMMM yyyy hh:mm:ss')
-                                          .format(note.lastEditedTime!)),
+                                      Text(
+                                        DateFormat('dd MMMM yyyy hh:mm:ss')
+                                            .format(note.lastEditedTime!),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ],
                                   )),
                             );
@@ -137,7 +157,7 @@ class HomePage extends StatelessWidget {
                     }
                     return const SizedBox.shrink();
                   },
-                )
+                ),
               ],
             ),
           ),

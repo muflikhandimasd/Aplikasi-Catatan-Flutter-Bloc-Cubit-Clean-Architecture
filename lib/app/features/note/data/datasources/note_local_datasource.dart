@@ -53,12 +53,18 @@ class NoteLocalDatasourceImpl implements NoteLocalDatasource {
   }
 
   @override
-  Future<List<Note>> searchNotes(String query) {
-    final queryBuilder = (box.query(
-            Note_.title.contains(query).or(Note_.content.contains(query)))
-          ..order(Note_.lastEditedTime, flags: Order.descending))
-        .build();
-    final notes = queryBuilder.find();
+  Future<List<Note>> searchNotes(String query) async {
+    final queryBuilder = box.query(Note_.title
+        .contains(query, caseSensitive: false)
+        .or(Note_.content.contains(query, caseSensitive: false)));
+
+    final notes = queryBuilder
+        .order(
+          Note_.lastEditedTime,
+          flags: Order.descending,
+        )
+        .build()
+        .find();
     return Future.value(notes);
   }
 

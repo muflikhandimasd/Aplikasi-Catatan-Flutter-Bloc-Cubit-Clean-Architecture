@@ -62,6 +62,7 @@ class NoteCubit extends Cubit<NoteState> {
   void search(String query) async {
     emit(NoteLoading());
     final result = await searchNote(query);
+
     result.fold((failure) => emit(NoteError(failure.message)),
         (notes) => emit(NoteLoaded(notes)));
   }
